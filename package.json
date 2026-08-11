@@ -1,0 +1,48 @@
+{
+  "name": "jani-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:next\" \"npm:dev:electron\"",
+    "dev:next": "next dev",
+    "dev:electron": "cross-env ELECTRON_START_URL=http://localhost:3000 wait-on http://localhost:3000 electron .",
+    "build": "next build",
+    "start:next": "next start",
+    "start": "cross-env ELECTRON_START_URL=http://localhost:3000 concurrently \"npm:start:next\" \"electron .\"",
+    "package": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@google-cloud/aiplatform": "^7.0.0",
+    "electron-store": "^8.1.0",
+    "next": "15.2.6",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^43.3.0",
+    "electron-builder": "^24.7.0",
+    "postcss": "^8.4.36",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.4",
+    "wait-on": "^7.0.1"
+  },
+  "build": {
+    "appId": "com.jani.desktop",
+    "productName": "Jani",
+    "files": ["**/*", "electron/**/*"],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "public/icon.png"
+    }
+  }
+}
