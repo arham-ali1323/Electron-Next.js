@@ -1,23 +1,39 @@
 import { NextResponse } from 'next/server';
-import { PredictionServiceClient } from '@google-cloud/aiplatform';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const client = new PredictionServiceClient();
-const modelName = process.env.GEMINI_MODEL_NAME || 'projects/YOUR_PROJECT/locations/us-central1/models/YOUR_GEMINI_MODEL';
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function POST(request: Request) {
   const body = await request.json();
   const messages = body.messages ?? [];
 
-  const prompt = messages.map((message: { role: string; text: string }) => {
-    const prefix = message.role === 'user' ? 'User:' : 'Assistant:';
-    return `${prefix} ${message.text}`;
-  }).join('\n');
+  if (!process.env.GEMINI_API_KEY) {
+    return NextResponse.json({ result: 'Jani needs his API key to think! Please set GEMINI_API_KEY in your environment.' }, { status: 500 });
+  }
 
-  const response = await client.predict({
-    endpoint: modelName,
-    instances: [{ content: prompt }],
-  });
+  try {
+    const chatHistory = messages.map((message: { role: string; text: string }) => ({
+      role: message.role === 'user' ? 'user' : 'model',
+      parts: [{ text: message.text }]
+    }));
 
-  const result = response[0]?.predictions?.[0]?.content || 'Jani could not generate a response right now.';
-  return NextResponse.json({ result });
+    const chat = model.startChat({
+      history: chatHistory.slice(0, -1),
+      generationConfig: {
+        maxOutputTokens: 1000,
+        temperature: 0.7,
+      },
+    });
+
+    const lastMessage = messages[messages.length - 1];
+    const result = await chat.sendMessage(lastMessage.text);
+    const response = await result.response;
+    const text = response.text();
+
+    return NextResponse.json({ result: text || 'Jani could not generate a response right now.' });
+  } catch (error) {
+    console.error('Gemini API error:', error);
+    return NextResponse.json({ result: 'Jani is having trouble connecting right now. Please try again!' }, { status: 500 });
+  }
 }

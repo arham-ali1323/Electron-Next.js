@@ -6,9 +6,7 @@ const store = new Store({ name: 'memory-journal' });
 let mainWindow = null;
 let tray = null;
 
-const trayIcon = nativeImage.createFromDataURL(
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABFklEQVR42mNgGAXUBwwAEMzIwMDAw4B0jAFdIjOAZLD0AciOJiYGBgYGBgYmJiYGBgYGBgYGBgYGJgYEJdQEK5xMKkIZ6hVsDqQ8WMBh8x5sA1xAGzAkalYg7sEMTugPrAlxqGUgNoF3IwEnYeUDtBMS8G5wDgSxm6B8SsDkRiGFQZYjIJY2BHg3MwCxaHcJtQFkfgZVL7AhBqEEOQF6h2CApOAbeHbO6kJ0GyA8Teg+MjpwTTO4A5gF4fxF89oVM2BgwMTQEgMBh/6RlwM4gS0dMthJLUwC3kSgtAF66AahFdMSgDpQ2iTg2HrAAQ5ABgE1yBgD6aMbd0gWIgAAAABJRU5ErkJggg=='
-);
+const trayIcon = nativeImage.createFromPath(path.join(__dirname, '../public/icon.svg'));
 
 function createWindow() {
   mainWindow = new BrowserWindow({

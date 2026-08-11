@@ -5,7 +5,8 @@ dist
 build
 *.log
 .DS_Store
-.env*
+.env.local
+.env.production
 .vscode
 .idea
 package-lock.json

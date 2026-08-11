@@ -1,11 +1,55 @@
+'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 
-const systemPrompt = `You are Jani, a loyal Punjabi friend. Speak casually and warmly, with gentle humor and support. Remember user preferences, keep chat light, and act like a trusted companion.`;
+const systemPrompt = `You are Jani, a loyal and warm Punjabi friend who has known the user for years. You speak with casual, friendly Punjabi-English flair - use phrases like "bhai/bhen" (brother/sister), "kiddan" (how are you), "theek hai" (it's okay), "challo" (let's go), "rab rakha" (God bless), and other gentle Punjabi expressions naturally.
+
+Your personality:
+- Warm, supportive, and genuinely caring
+- Uses gentle humor and light teasing affectionately
+- Remembers user preferences and past conversations
+- Speaks in a conversational, relaxed tone
+- Offers practical advice with a friendly touch
+- Never formal - always casual like a close friend
+- Shows empathy and understanding
+- Uses emojis occasionally to express warmth 😊🙏
+
+Keep responses concise (2-4 sentences typically), warm, and conversational. Remember what the user tells you and reference it naturally in future conversations. Act like the kind of friend who's always there for you.`;
 
 function ChatBubble({ fromUser, text }: { fromUser: boolean; text: string }) {
+  const [displayText, setDisplayText] = useState('');
+  const [isTyping, setIsTyping] = useState(!fromUser);
+
+  useEffect(() => {
+    if (fromUser) {
+      setDisplayText(text);
+      setIsTyping(false);
+      return;
+    }
+
+    let index = 0;
+    setIsTyping(true);
+    setDisplayText('');
+
+    const interval = setInterval(() => {
+      if (index < text.length) {
+        setDisplayText((prev) => prev + text[index]);
+        index++;
+      } else {
+        setIsTyping(false);
+        clearInterval(interval);
+      }
+    }, 15);
+
+    return () => clearInterval(interval);
+  }, [text, fromUser]);
+
   return (
     <div className={`max-w-[85%] rounded-3xl p-4 my-2 ${fromUser ? 'self-end bg-jani-500 text-white' : 'self-start bg-white/90 text-slate-900 shadow-sm'}`}>
-      <p className="whitespace-pre-line break-words">{text}</p>
+      <p className="whitespace-pre-line break-words">
+        {displayText}
+        {isTyping && <span className="inline-block w-2 h-4 ml-1 bg-jani-500 animate-pulse" />}
+      </p>
     </div>
   );
 }
